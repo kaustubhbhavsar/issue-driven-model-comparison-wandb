@@ -1,6 +1,7 @@
 name: model-comparison-report
 on:
   issues:
+      types: [opened, reopened, edited]
  
 permissions:
   contents: read
