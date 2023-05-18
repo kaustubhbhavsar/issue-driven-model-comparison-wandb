@@ -34,9 +34,9 @@ jobs:
         id: wandb-report
         run: python generate_reports.py
         env:
-          WANDB_ENTITY: bhavsar-kaustubh
-          WANDB_PROJECT: nyc-taxi-trip-duration
-          BASELINE_TAG: final-model-training
+          WANDB_ENTITY: ${{ env.WANDB_ENTITY }}
+          WANDB_PROJECT: ${{ env.WANDB_PROJECT }}
+          BASELINE_TAG: ${{ env.WANDB_TAG }}
           RUN_ID: "${{ steps.get-runid-value.outputs.RUN_ID }}"
           WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
 
