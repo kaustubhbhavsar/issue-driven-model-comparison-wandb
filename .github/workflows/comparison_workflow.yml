@@ -1,0 +1,56 @@
+name: model-comparison-report
+on:
+  issues:
+ 
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  final-assign:
+    if: contains(github.event.issue.body, '/wandb')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get repo contents
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: pip install ghapi wandb
+
+      - name: Parse value from the command
+        id: get-runid-value
+        run: |
+          echo "${{ github.event.issue.body }}" > issue.txt
+          match=$(grep -Po '(?<=/wandb\s)\S+' issue.txt || true)
+          if [[ -n "$match" ]]; then
+            echo "::set-output name=VAL_FOUND::true"
+            echo "::set-output name=RUN_ID::$match"
+          else
+            echo "::set-output name=VAL_FOUND::false"
+          fi
+
+      - name: Generate the comparison report
+        if: steps.get-runid-value.outputs.VAL_FOUND == 'true'
+        id: wandb-report
+        run: python generate_reports.py
+        env:
+          WANDB_ENTITY: bhavsar-kaustubh
+          WANDB_PROJECT: nyc-taxi-trip-duration
+          BASELINE_TAG: final-model-training
+          RUN_ID: "${{ steps.get-runid-value.outputs.RUN_ID }}"
+          WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+
+      - name: Make a comment with the GitHub API
+        uses: actions/github-script@v6
+        if: steps.wandb-report.outcome == 'success' 
+        with:
+          script: |
+            var msg = `Hey! The team will respond to you shortly. We have also created a comparison between the linked run and baseline, and is available [in this report](${process.env.REPORT_URL})`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: msg
+            });
+        env:
+          REPORT_URL: "${{ steps.wandb-report.outputs.REPORT_URL }}"
