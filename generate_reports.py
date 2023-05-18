@@ -28,9 +28,9 @@ def get_baseline_run(
     return runs[0]
 
 def compare_runs(
-  entity: str = 'bhavsar-kaustubh',
-  project: str = 'nyc-taxi-trip-duration',
-  tag: str = 'final-model-training',
+  entity: str = None,
+  project: str = None,
+  tag: str = None,
   run_id: str = None
 ):
     """
@@ -51,7 +51,7 @@ def compare_runs(
     entity = os.getenv('WANDB_ENTITY') or entity
     project = os.getenv('WANDB_PROJECT') or project
     tag = os.getenv('BASELINE_TAG') or tag
-    run_id = os.getenv('RUN_ID') 
+    run_id = os.getenv('RUN_ID') or run_id
     assert run_id, 'You must set the RUN_ID environment variable or pass a `run_id` argument'
 
     baseline = get_baseline_run(entity=entity, project=project, tag=tag)
