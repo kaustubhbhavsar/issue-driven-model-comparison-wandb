@@ -4,8 +4,8 @@ import wandb.apis.reports as wr
 assert os.getenv('WANDB_API_KEY'), 'You must set the WANDB_API_KEY environment variable'
 
 def get_baseline_run(
-  entity: str,
-  project: str,
+  entity: str, 
+  project: str, 
   tag: str
 ):
     """
@@ -27,11 +27,10 @@ def get_baseline_run(
     assert len(runs) == 1, 'There must be exactly one run with the tag "baseline"'
     return runs[0]
 
-
 def compare_runs(
-  entity: str = None,
-  project: str = None,
-  tag: str = None,
+  entity: str = 'bhavsar-kaustubh',
+  project: str = 'nyc-taxi-trip-duration',
+  tag: str = 'final-model-training',
   run_id: str = None
 ):
     """
@@ -49,9 +48,9 @@ def compare_runs(
     Raises:
          AssertionError: If the 'RUN_ID' environment variable or the run_id argument is not set.
     """
-    entity = os.getenv('WANDB_ENTITY') 
-    project = os.getenv('WANDB_PROJECT') 
-    tag = os.getenv('BASELINE_TAG') 
+    entity = os.getenv('WANDB_ENTITY') or entity
+    project = os.getenv('WANDB_PROJECT') or project
+    tag = os.getenv('BASELINE_TAG') or tag
     run_id = os.getenv('RUN_ID') 
     assert run_id, 'You must set the RUN_ID environment variable or pass a `run_id` argument'
 
